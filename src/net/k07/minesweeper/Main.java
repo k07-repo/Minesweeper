@@ -6,11 +6,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
+
 public class Main {
     public static MinesweeperGrid grid;
     public static MinesweeperButton pressedButton;
     public static void main(String[] args) {
-        grid = new MinesweeperGrid(40, 20, 30);
+        grid = new MinesweeperGrid(80, 20, 30);
         pressedButton = null;
 
         JFrame rootWindow = new JFrame();
@@ -35,25 +36,29 @@ public class Main {
                     public void mouseReleased(MouseEvent e) {
                         if(button == pressedButton) {
                             if (SwingUtilities.isLeftMouseButton(e) && SwingUtilities.isRightMouseButton(e)) {
-                                if (!button.isEnabled() && button.cell.isRevealed) {
+                                if (!button.isEnabled() && button.cell.getState() == MinesweeperCell.State.REVEALED) {
                                     revealAllAdjacentWithFlagCheck(button);
                                 }
                             }
-                            if (SwingUtilities.isLeftMouseButton(e)) {
-                                if (!button.cell.isFlagged) {
-                                    reveal(button);
-                                }
-                            } else if (SwingUtilities.isRightMouseButton(e)) {
-                                if (!button.cell.isRevealed) {
-                                    flag(button);
+                            else if(button.isEnabled()) {
+                                if (SwingUtilities.isLeftMouseButton(e)) {
+                                    if (!(button.cell.getState() == MinesweeperCell.State.FLAGGED)) {
+                                        reveal(button);
+                                    }
+                                } else if (SwingUtilities.isRightMouseButton(e)) {
+                                    if (!(button.cell.getState() == MinesweeperCell.State.REVEALED)) {
+                                        rotateFlagState(button);
+                                    }
                                 }
                             }
                         }
 
                         pressedButton = null;
                     }
+
                     public void mouseEntered(MouseEvent e) {
                     }
+
                     public void mouseExited(MouseEvent e) {
                         pressedButton = null;
                     }
@@ -69,10 +74,11 @@ public class Main {
 
     public static void reveal(MinesweeperButton button) {
         MinesweeperCell cell = button.cell;
-        if(!cell.isRevealed && !cell.isFlagged) {
+        MinesweeperCell.State state = cell.getState();
+        if(state == MinesweeperCell.State.NONE || state == MinesweeperCell.State.QUESTIONED) {
             button.setText(cell.toString());
             button.setEnabled(false);
-            cell.isRevealed = true;
+            cell.setState(MinesweeperCell.State.REVEALED);
             if (cell.getNumber() == 0) {
                 button.setBackground(new Color(40, 40, 40));
                 revealAllAdjacent(button);
@@ -93,7 +99,7 @@ public class Main {
         System.out.println(adjacentCells);
         int flagCount = 0;
         for (MinesweeperCell c : adjacentCells) {
-            if(c.isFlagged) {
+            if(c.getState() == MinesweeperCell.State.FLAGGED) {
                 flagCount++;
             }
         }
@@ -105,14 +111,21 @@ public class Main {
         }
     }
 
-    public static void flag(MinesweeperButton button) {
+    public static void rotateFlagState(MinesweeperButton button) {
         MinesweeperCell cell = button.cell;
-        if(cell.isFlagged) {
-            cell.isFlagged = false;
-            button.setText(" ");
+        if(cell.getState() == MinesweeperCell.State.REVEALED) {
+            return;
         }
-        else if(cell.isRevealed == false){
-            cell.isFlagged = true;
+        else if(cell.getState() == MinesweeperCell.State.FLAGGED) {
+            cell.setState(MinesweeperCell.State.QUESTIONED);
+            button.setText("?");
+        }
+        else if(cell.getState() == MinesweeperCell.State.QUESTIONED){
+            cell.setState(MinesweeperCell.State.NONE);
+            button.setText("");
+        }
+        else {
+            cell.setState(MinesweeperCell.State.FLAGGED);
             button.setText("!");
         }
     }

@@ -2,6 +2,10 @@ package net.k07.minesweeper;
 
 public class MinesweeperCell {
 
+    enum State {
+        NONE, REVEALED, QUESTIONED, FLAGGED
+    }
+
     public MinesweeperButton button;
     public int row;
     public int column;
@@ -9,14 +13,20 @@ public class MinesweeperCell {
     private static final int MINE = -1;
     private static final int UNINITIALIZED = -2;
 
-    public boolean isFlagged = false;
-    public boolean isRevealed = false;
-
-    public int number;
-
+    private int number;
+    private State state;
     public MinesweeperCell() {
         this.number = UNINITIALIZED;
         this.button = null;
+        this.state = State.NONE;
+    }
+
+    public State getState() {
+        return this.state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
     }
 
     public void setButton(MinesweeperButton b) {
