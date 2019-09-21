@@ -2,16 +2,16 @@ package net.k07.minesweeper;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
 public class Main {
     public static MinesweeperGrid grid;
+    public static MinesweeperButton pressedButton;
     public static void main(String[] args) {
         grid = new MinesweeperGrid(40, 20, 30);
+        pressedButton = null;
 
         JFrame rootWindow = new JFrame();
         JPanel rootPanel = new JPanel();
@@ -28,30 +28,34 @@ public class Main {
                 button.addMouseListener(new MouseListener() {
                     public void mouseClicked(MouseEvent e) {
 
-                        if(SwingUtilities.isLeftMouseButton(e) && SwingUtilities.isRightMouseButton(e)) {
-                            if(!button.isEnabled() && button.cell.isRevealed) {
-                                revealAllAdjacentWithFlagCheck(button);
+                    }
+                    public void mousePressed(MouseEvent e) {
+                        pressedButton = button;
+                    }
+                    public void mouseReleased(MouseEvent e) {
+                        if(button == pressedButton) {
+                            if (SwingUtilities.isLeftMouseButton(e) && SwingUtilities.isRightMouseButton(e)) {
+                                if (!button.isEnabled() && button.cell.isRevealed) {
+                                    revealAllAdjacentWithFlagCheck(button);
+                                }
                             }
-                        }
-                        if(SwingUtilities.isLeftMouseButton(e)) {
-                            if(!button.cell.isFlagged) {
-                                reveal(button);
-                            }
-                        }
-                        else if(SwingUtilities.isRightMouseButton(e)) {
-                            if(!button.cell.isRevealed) {
-                                flag(button);
+                            if (SwingUtilities.isLeftMouseButton(e)) {
+                                if (!button.cell.isFlagged) {
+                                    reveal(button);
+                                }
+                            } else if (SwingUtilities.isRightMouseButton(e)) {
+                                if (!button.cell.isRevealed) {
+                                    flag(button);
+                                }
                             }
                         }
 
-                    }
-                    public void mousePressed(MouseEvent e) {
-                    }
-                    public void mouseReleased(MouseEvent e) {
+                        pressedButton = null;
                     }
                     public void mouseEntered(MouseEvent e) {
                     }
                     public void mouseExited(MouseEvent e) {
+                        pressedButton = null;
                     }
 
 
