@@ -2,17 +2,28 @@ package net.k07.minesweeper;
 
 public class MinesweeperCell {
 
+    public MinesweeperButton button;
     public int row;
     public int column;
 
     private static final int MINE = -1;
     private static final int UNINITIALIZED = -2;
+
+    public boolean isFlagged = false;
+    public boolean isRevealed = false;
+
     public int number;
 
     public MinesweeperCell() {
         this.number = UNINITIALIZED;
+        this.button = null;
     }
 
+    public void setButton(MinesweeperButton b) {
+        if(this.button == null) {
+            this.button = b;
+        }
+    }
     public void setMine() {
         this.number = MINE;
     }
@@ -36,6 +47,8 @@ public class MinesweeperCell {
                 return "X";
             case 0:
                 return " ";
+            case -3:
+                return "Flag";
             default:
                 return this.number + "";
         }

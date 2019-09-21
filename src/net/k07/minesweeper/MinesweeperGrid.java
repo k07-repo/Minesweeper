@@ -8,7 +8,7 @@ public class MinesweeperGrid {
     private int rows;
     private int cols;
 
-    public ArrayList<MinesweeperCell> grid = new ArrayList<MinesweeperCell>();
+    public MinesweeperCell[][] grid;
 
     public MinesweeperGrid(int mines, int rows, int cols)
     {
@@ -16,7 +16,7 @@ public class MinesweeperGrid {
         this.rows = rows;
         this.cols = cols;
 
-        if(rows == cols);
+        grid = new MinesweeperCell[rows][cols];
 
         createGrid();
         initializeGrid();
@@ -25,15 +25,22 @@ public class MinesweeperGrid {
 
 
     public void createGrid() {
+
+        ArrayList<MinesweeperCell> mineArray = new ArrayList<MinesweeperCell>();
+
         for(int k = 0; k < rows * cols; k++) {
             MinesweeperCell newCell = new MinesweeperCell();
             if(k < numberOfMines) {
                 newCell.setMine();
             }
-            grid.add(k, newCell);
+            mineArray.add(k, newCell);
         }
 
-        Collections.shuffle(grid);
+        Collections.shuffle(mineArray);
+
+        for(int k = 0; k < mineArray.size(); k++) {
+            grid[k / cols][k % cols] = mineArray.get(k);
+        }
     }
 
     public void initializeGrid() {
@@ -57,11 +64,7 @@ public class MinesweeperGrid {
     }
 
     public MinesweeperCell getCellAt(int row, int col) {
-        return grid.get(convertToIndex(row, col));
-    }
-
-    public int convertToIndex(int row, int col) {
-        return (rows * row) + col;
+        return grid[row][col];
     }
 
     public int getNumberOfAdjacentMines(int row, int col) {
@@ -79,8 +82,8 @@ public class MinesweeperGrid {
     public ArrayList<MinesweeperCell> getAdjacentCells(int r, int c) {
         ArrayList<MinesweeperCell> result = new ArrayList<MinesweeperCell>();
 
-        for(int row = -1; row <= 1; row++) {
-            for(int col = -1; col <= 1; col++) {
+        for(int row = -1; row < 2; row++) {
+            for(int col = -1; col < 2; col++) {
                 if(!(row == 0 && col == 0)) {
                     if(isValidCellLocation(r + row, c + col)) {
                         result.add(getCellAt(r + row, c + col));
