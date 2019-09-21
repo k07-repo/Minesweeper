@@ -30,7 +30,7 @@ public class Main {
 
                         if(SwingUtilities.isLeftMouseButton(e) && SwingUtilities.isRightMouseButton(e)) {
                             if(!button.isEnabled() && button.cell.isRevealed) {
-                                revealAllAdjacent(button);
+                                revealAllAdjacentWithFlagCheck(button);
                             }
                         }
                         if(SwingUtilities.isLeftMouseButton(e)) {
@@ -81,6 +81,23 @@ public class Main {
         System.out.println(adjacentCells);
         for (MinesweeperCell c : adjacentCells) {
             reveal(c.button);
+        }
+    }
+
+    public static void revealAllAdjacentWithFlagCheck(MinesweeperButton button) {
+        ArrayList<MinesweeperCell> adjacentCells = grid.getAdjacentCells(button.row, button.col);
+        System.out.println(adjacentCells);
+        int flagCount = 0;
+        for (MinesweeperCell c : adjacentCells) {
+            if(c.isFlagged) {
+                flagCount++;
+            }
+        }
+
+        if(flagCount == button.cell.getNumber()) {
+            for (MinesweeperCell c : adjacentCells) {
+                reveal(c.button);
+            }
         }
     }
 
