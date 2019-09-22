@@ -7,6 +7,11 @@ import java.util.ArrayList;
 
 
 public class Main {
+
+    enum GameState {
+        ONGOING, LOST, WON
+    }
+
     public static MinesweeperGrid grid;
     public static MinesweeperButton pressedButton;
 
@@ -18,7 +23,20 @@ public class Main {
     public static JTextField colField = new JTextField();
     public static JTextField mineField = new JTextField();
 
-    public static boolean won = false;
+    public static GameState gameState = GameState.ONGOING;
+
+    public static void setState(GameState state) {
+        gameState = state;
+
+        if(gameState == GameState.LOST) {
+            revealAllMines(false);
+            JOptionPane.showMessageDialog(optionSetWindow, "Ba-boom!", "Better luck next time...", JOptionPane.ERROR_MESSAGE);
+        }
+        else if(gameState == GameState.WON) {
+            revealAllMines(true);
+            JOptionPane.showMessageDialog(optionSetWindow, "You win!", "Congratulations!", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
 
     public static boolean validateInput(JTextField field, String fieldName, int min, int max) {
         String text = field.getText();
@@ -179,7 +197,9 @@ public class Main {
                 revealAllAdjacent(button);
             }
             else if(cell.isMine()) {
-                revealAllMines(false);
+                if(gameState == GameState.ONGOING) {
+                    setState(GameState.LOST);
+                }
             }
 
             checkForWin();
@@ -243,7 +263,7 @@ public class Main {
     }
 
     public static void checkForWin() {
-        if (won) {
+        if (!(gameState == GameState.ONGOING)) {
             return;
         }
 
@@ -253,9 +273,8 @@ public class Main {
                 return;
         }
 
-        won = true;
-        revealAllMines(true);
-        JOptionPane.showMessageDialog(optionSetWindow, "You win!", "Congratulations!", JOptionPane.INFORMATION_MESSAGE);
+        setState(GameState.WON);
+
     }
 
 }
