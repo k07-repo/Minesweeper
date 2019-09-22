@@ -18,8 +18,7 @@ public class Main {
     public static JTextField colField = new JTextField();
     public static JTextField mineField = new JTextField();
 
-    public static boolean playHit = false;
-
+    public static boolean won = false;
 
     public static boolean validateInput(JTextField field, String fieldName, int min, int max) {
         String text = field.getText();
@@ -41,13 +40,7 @@ public class Main {
             JOptionPane.showMessageDialog(null, fieldName + ": value too high! Maximum: " + max, "Error", JOptionPane.ERROR_MESSAGE);
             return false;
         }
-
         return true;
-
-    }
-
-    public static void play() {
-        playHit = true;
     }
 
     public static void main(String[] args) {
@@ -88,9 +81,15 @@ public class Main {
                     return;
                 } else if (!validateInput(colField, "Rows", 5, 30)) {
                     return;
-                } else if (!validateInput(mineField, "Mines", 5, 400)) {
+                }
+
+                int rows = Integer.parseInt(rowField.getText());
+                int cols =  Integer.parseInt(colField.getText());
+
+                if (!validateInput(mineField, "Mines", 1, (rows * cols) - 1)) {
                     return;
                 }
+
                 optionSetWindow.dispatchEvent(new WindowEvent(optionSetWindow, WindowEvent.WINDOW_CLOSING));
                 setupWindow();
             }
@@ -180,8 +179,10 @@ public class Main {
                 revealAllAdjacent(button);
             }
             else if(cell.isMine()) {
-                revealAllMines();
+                revealAllMines(false);
             }
+
+            checkForWin();
         }
     }
 
@@ -229,12 +230,32 @@ public class Main {
         }
     }
 
-    public static void revealAllMines() {
+    public static void revealAllMines(boolean flagMines) {
         for(MinesweeperCell c: grid.getAllCells()) {
             MinesweeperCell.State state = c.getState();
             if(c.isMine() && state != MinesweeperCell.State.FLAGGED && state != MinesweeperCell.State.REVEALED) {
+                if(flagMines) {
+                    c.setState(MinesweeperCell.State.FLAGGED);
+                }
                 c.button.setText(c.toString());
             }
         }
     }
+
+    public static void checkForWin() {
+        if (won) {
+            return;
+        }
+
+        for (MinesweeperCell c : grid.getAllCells()) {
+            MinesweeperCell.State state = c.getState();
+            if (state != MinesweeperCell.State.REVEALED && !c.isMine())
+                return;
+        }
+
+        won = true;
+        revealAllMines(true);
+        JOptionPane.showMessageDialog(optionSetWindow, "You win!", "Congratulations!", JOptionPane.INFORMATION_MESSAGE);
+    }
+
 }

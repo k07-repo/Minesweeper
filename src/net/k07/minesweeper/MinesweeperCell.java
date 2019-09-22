@@ -52,15 +52,22 @@ public class MinesweeperCell {
 
     @Override
     public String toString() {
-        switch(this.number) {
-            case MINE:
-                return "X";
-            case 0:
-                return " ";
-            case -3:
-                return "Flag";
+        switch(this.state) {
+            case FLAGGED:
+                return "!";
+            case QUESTIONED:
+                return "?";
             default:
-                return this.number + "";
+                switch(this.number) {
+                    case MINE:
+                        return "X";
+                    case 0:
+                        return " ";
+                    case -3:
+                        return "Flag";
+                    default:
+                        return this.number + "";
+                }
         }
     }
 }
