@@ -2,25 +2,123 @@ package net.k07.minesweeper;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 
 
 public class Main {
     public static MinesweeperGrid grid;
     public static MinesweeperButton pressedButton;
+
+    public static JFrame rootWindow;
+    public static JPanel rootPanel;
+    public static JFrame optionSetWindow;
+
+    public static JTextField rowField = new JTextField();
+    public static JTextField colField = new JTextField();
+    public static JTextField mineField = new JTextField();
+
+    public static boolean playHit = false;
+
+
+    public static boolean validateInput(JTextField field, String fieldName, int min, int max) {
+        String text = field.getText();
+        int value = -1;
+
+        try {
+            value = Integer.parseInt(text);
+        }
+        catch(NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, fieldName + ": numeric values only!", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        if(value < min) {
+            JOptionPane.showMessageDialog(null, fieldName + ": value too low! Minimum: " + min, "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        else if(value > max) {
+            JOptionPane.showMessageDialog(null, fieldName + ": value too high! Maximum: " + max, "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        return true;
+
+    }
+
+    public static void play() {
+        playHit = true;
+    }
+
     public static void main(String[] args) {
-        grid = new MinesweeperGrid(80, 20, 30);
+        grid = new MinesweeperGrid(50, 20, 30);
         pressedButton = null;
 
-        JFrame rootWindow = new JFrame();
-        JPanel rootPanel = new JPanel();
-        rootWindow.add(rootPanel);
-        rootPanel.setLayout(new GridLayout(20 , 30));
+        boolean playHit = false;
 
-        for(int row = 0; row < 20; row++) {
-            for(int col = 0; col < 30; col++) {
+        optionSetWindow = new JFrame();
+        optionSetWindow.setLayout(new GridLayout(5, 1));
+
+        JPanel sub1 = new JPanel();
+        JPanel sub2 = new JPanel();
+        JPanel sub3 = new JPanel();
+
+
+        JButton playButton = new JButton("Play");
+        optionSetWindow.add(new JLabel("Set Options"));
+
+        sub1.setLayout(new GridLayout(1, 2));
+        sub1.add(new JLabel("Rows: "));
+        sub1.add(rowField);
+        optionSetWindow.add(sub1);
+
+        sub2.setLayout(new GridLayout(1, 2));
+        sub2.add(new JLabel("Columns: "));
+        sub2.add(colField);
+        optionSetWindow.add(sub2);
+
+        sub3.setLayout(new GridLayout(1, 2));
+        sub3.add(new JLabel("Mines: "));
+        sub3.add(mineField);
+        optionSetWindow.add(sub3);
+
+        playButton.addActionListener( new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (!validateInput(rowField, "Rows", 5, 20)) {
+                    return;
+                } else if (!validateInput(colField, "Rows", 5, 30)) {
+                    return;
+                } else if (!validateInput(mineField, "Mines", 5, 400)) {
+                    return;
+                }
+                optionSetWindow.dispatchEvent(new WindowEvent(optionSetWindow, WindowEvent.WINDOW_CLOSING));
+                setupWindow();
+            }
+        });
+
+        optionSetWindow.add(playButton);
+        optionSetWindow.setSize(250, 250);
+        optionSetWindow.setResizable(false);
+        optionSetWindow.setVisible(true);
+
+
+    }
+
+    public static void setupWindow() {
+        rootWindow = new JFrame("Minesweeper");
+        rootWindow.setSize(500, 600);
+        rootPanel = new JPanel();
+        rootWindow.add(rootPanel);
+
+
+        int rows = Integer.parseInt(rowField.getText());
+        int cols =  Integer.parseInt(colField.getText());
+        int mines =  Integer.parseInt(mineField.getText());
+        grid = new MinesweeperGrid(mines, rows, cols);
+        rootPanel.setLayout(new GridLayout(rows, cols));
+
+        for(int row = 0; row < rows; row++) {
+            for(int col = 0; col < cols; col++) {
                 MinesweeperButton button = new MinesweeperButton("", row, col);
                 MinesweeperCell cell = grid.getCellAt(row, col);
                 cell.setButton(button);
@@ -68,10 +166,8 @@ public class Main {
                 rootPanel.add(button);
             }
         }
-
         rootWindow.setVisible(true);
     }
-
     public static void reveal(MinesweeperButton button) {
         MinesweeperCell cell = button.cell;
         MinesweeperCell.State state = cell.getState();
@@ -82,6 +178,9 @@ public class Main {
             if (cell.getNumber() == 0) {
                 button.setBackground(new Color(40, 40, 40));
                 revealAllAdjacent(button);
+            }
+            else if(cell.isMine()) {
+                revealAllMines();
             }
         }
     }
@@ -127,6 +226,15 @@ public class Main {
         else {
             cell.setState(MinesweeperCell.State.FLAGGED);
             button.setText("!");
+        }
+    }
+
+    public static void revealAllMines() {
+        for(MinesweeperCell c: grid.getAllCells()) {
+            MinesweeperCell.State state = c.getState();
+            if(c.isMine() && state != MinesweeperCell.State.FLAGGED && state != MinesweeperCell.State.REVEALED) {
+                c.button.setText(c.toString());
+            }
         }
     }
 }

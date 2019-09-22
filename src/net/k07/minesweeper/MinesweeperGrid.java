@@ -80,7 +80,7 @@ public class MinesweeperGrid {
     }
 
     public ArrayList<MinesweeperCell> getAdjacentCells(int r, int c) {
-        ArrayList<MinesweeperCell> result = new ArrayList<MinesweeperCell>();
+        ArrayList<MinesweeperCell> result = new ArrayList<>();
 
         for(int row = -1; row < 2; row++) {
             for(int col = -1; col < 2; col++) {
@@ -89,6 +89,17 @@ public class MinesweeperGrid {
                         result.add(getCellAt(r + row, c + col));
                     }
                 }
+            }
+        }
+
+        return result;
+    }
+
+    public ArrayList<MinesweeperCell> getAllCells() {
+        ArrayList<MinesweeperCell> result = new ArrayList<>();
+        for(int row = 0; row < rows; row++) {
+            for(int col = 0; col < cols; col++) {
+                result.add(grid[row][col]);
             }
         }
 
