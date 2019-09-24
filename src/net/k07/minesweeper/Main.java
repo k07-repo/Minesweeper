@@ -25,6 +25,15 @@ public class Main {
 
     public static GameState gameState = GameState.ONGOING;
 
+    public static boolean firstClick = false;
+
+    public static void main(String[] args) {
+        pressedButton = null;
+        firstClick = true;
+
+        setupOptionsWindow();
+    }
+
     public static void setState(GameState state) {
         gameState = state;
 
@@ -61,11 +70,7 @@ public class Main {
         return true;
     }
 
-    public static void main(String[] args) {
-        grid = new MinesweeperGrid(50, 20, 30);
-        pressedButton = null;
-
-        boolean playHit = false;
+    public static void setupOptionsWindow() {
 
         optionSetWindow = new JFrame();
         optionSetWindow.setLayout(new GridLayout(5, 1));
@@ -73,7 +78,6 @@ public class Main {
         JPanel sub1 = new JPanel();
         JPanel sub2 = new JPanel();
         JPanel sub3 = new JPanel();
-
 
         JButton playButton = new JButton("Play");
         optionSetWindow.add(new JLabel("Set Options"));
@@ -116,17 +120,17 @@ public class Main {
         optionSetWindow.add(playButton);
         optionSetWindow.setSize(250, 250);
         optionSetWindow.setResizable(false);
+        optionSetWindow.setLocationRelativeTo(null);
         optionSetWindow.setVisible(true);
-
-
     }
+
+
 
     public static void setupWindow() {
         rootWindow = new JFrame("Minesweeper");
         rootWindow.setSize(500, 600);
         rootPanel = new JPanel();
         rootWindow.add(rootPanel);
-
 
         int rows = Integer.parseInt(rowField.getText());
         int cols =  Integer.parseInt(colField.getText());
@@ -149,20 +153,22 @@ public class Main {
                         pressedButton = button;
                     }
                     public void mouseReleased(MouseEvent e) {
-                        if(button == pressedButton) {
-                            if (SwingUtilities.isLeftMouseButton(e) && SwingUtilities.isRightMouseButton(e)) {
-                                if (!button.isEnabled() && button.cell.getState() == MinesweeperCell.State.REVEALED) {
-                                    revealAllAdjacentWithFlagCheck(button);
-                                }
-                            }
-                            else if(button.isEnabled()) {
-                                if (SwingUtilities.isLeftMouseButton(e)) {
-                                    if (!(button.cell.getState() == MinesweeperCell.State.FLAGGED)) {
-                                        reveal(button);
+
+                        if(gameState == GameState.ONGOING) {
+                            if (button == pressedButton) {
+                                if (SwingUtilities.isLeftMouseButton(e) && SwingUtilities.isRightMouseButton(e)) {
+                                    if (!button.isEnabled() && button.cell.getState() == MinesweeperCell.State.REVEALED) {
+                                        revealAllAdjacentWithFlagCheck(button);
                                     }
-                                } else if (SwingUtilities.isRightMouseButton(e)) {
-                                    if (!(button.cell.getState() == MinesweeperCell.State.REVEALED)) {
-                                        rotateFlagState(button);
+                                } else if (button.isEnabled()) {
+                                    if (SwingUtilities.isLeftMouseButton(e)) {
+                                        if (!(button.cell.getState() == MinesweeperCell.State.FLAGGED)) {
+                                            reveal(button);
+                                        }
+                                    } else if (SwingUtilities.isRightMouseButton(e)) {
+                                        if (!(button.cell.getState() == MinesweeperCell.State.REVEALED)) {
+                                            rotateFlagState(button);
+                                        }
                                     }
                                 }
                             }
@@ -202,6 +208,9 @@ public class Main {
                 }
             }
 
+            if(firstClick) {
+                firstClick = false;
+            }
             checkForWin();
         }
     }
@@ -274,7 +283,6 @@ public class Main {
         }
 
         setState(GameState.WON);
-
     }
 
 }

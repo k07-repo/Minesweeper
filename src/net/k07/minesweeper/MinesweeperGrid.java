@@ -2,11 +2,13 @@ package net.k07.minesweeper;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
 
 public class MinesweeperGrid {
     private int numberOfMines;
     private int rows;
     private int cols;
+    private Random random;
 
     public MinesweeperCell[][] grid;
 
@@ -15,6 +17,7 @@ public class MinesweeperGrid {
         this.numberOfMines = mines;
         this.rows = rows;
         this.cols = cols;
+        this.random = new Random();
 
         grid = new MinesweeperCell[rows][cols];
 
@@ -48,9 +51,15 @@ public class MinesweeperGrid {
             for(int col = 0; col < cols; col++) {
                 MinesweeperCell current = getCellAt(row, col);
                 if(!current.isMine()) {
-                    current.setNumber(getNumberOfAdjacentMines(row, col));
+                   current.setNumber(getNumberOfAdjacentMines(row, col));
                 }
             }
+        }
+    }
+
+    public void setCellNumber(MinesweeperCell cell) {
+        if(!cell.isMine()) {
+            cell.setNumber(getNumberOfAdjacentMines(cell.row, cell.column));
         }
     }
 
@@ -60,6 +69,16 @@ public class MinesweeperGrid {
                 System.out.print(getCellAt(row, col).toString() + " ");
             }
             System.out.println();
+        }
+    }
+
+    public MinesweeperCell getRandomSafeCell() {
+         printGrid();
+         while (true) {
+            MinesweeperCell result = this.getCellAt(random.nextInt(rows), random.nextInt(cols));
+            if (!result.isMine()) {
+                return result;
+            }
         }
     }
 
