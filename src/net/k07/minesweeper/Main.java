@@ -3,6 +3,7 @@ package net.k07.minesweeper;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.util.ArrayList;
 
 
@@ -17,7 +18,10 @@ public class Main {
 
     public static JFrame rootWindow;
     public static JPanel rootPanel;
+    public static JToolBar toolbar;
     public static JFrame optionSetWindow;
+
+    public static JLabel minesLeft = new JLabel();
 
     public static JTextField rowField = new JTextField();
     public static JTextField colField = new JTextField();
@@ -27,17 +31,32 @@ public class Main {
 
     public static boolean firstClick = false;
 
-    public static void main(String[] args) {
+    public static int rows = -1;
+    public static int cols = -1;
+    public static int mines = -1;
+    public static int mineCount = -1;
+
+    public static Options options = new Options();
+    public static void main(String[] args) throws Exception {
         pressedButton = null;
         firstClick = true;
 
-        setupOptionsWindow();
+        if(options.loadFromFile()) {
+            rows = options.rows;
+            cols = options.columns;
+            mines = options.mines;
+            setupWindow();
+        }
+        else {
+            setupOptionsWindow();
+        }
     }
 
     public static void newGame() {
         grid.createGrid();
         grid.initializeGrid();
         addGridToWindow();
+        setMinesLeft(mineCount);
 
         setState(GameState.ONGOING);
     }
@@ -115,15 +134,25 @@ public class Main {
                     return;
                 }
 
-                int rows = Integer.parseInt(rowField.getText());
-                int cols =  Integer.parseInt(colField.getText());
+                int rowsFromField = Integer.parseInt(rowField.getText());
+                int colsFromField =  Integer.parseInt(colField.getText());
 
-                if (!validateInput(mineField, "Mines", 1, (rows * cols) - 1)) {
+                if (!validateInput(mineField, "Mines", 1, (rowsFromField * colsFromField) - 1)) {
                     return;
                 }
 
-                optionSetWindow.dispatchEvent(new WindowEvent(optionSetWindow, WindowEvent.WINDOW_CLOSING));
+                int minesFromField =  Integer.parseInt(mineField.getText());
+
+                rows = rowsFromField;
+                cols = colsFromField;
+                mines = minesFromField;
+
+                options.rows = rows;
+                options.columns = cols;
+                options.mines = mines;
+
                 setupWindow();
+                optionSetWindow.dispatchEvent(new WindowEvent(optionSetWindow, WindowEvent.WINDOW_CLOSING));
             }
         });
 
@@ -136,10 +165,7 @@ public class Main {
 
     public static void addGridToWindow() {
         rootPanel.removeAll();
-
-        int rows = Integer.parseInt(rowField.getText());
-        int cols =  Integer.parseInt(colField.getText());
-        int mines =  Integer.parseInt(mineField.getText());
+        mineCount = mines;
         grid = new Grid(mines, rows, cols);
         grid.createGrid();
         grid.initializeGrid();
@@ -204,13 +230,46 @@ public class Main {
 
     public static void setupWindow() {
         rootWindow = new JFrame("Minesweeper");
+        rootWindow.setLayout(new BorderLayout());
         rootWindow.setSize(500, 600);
         rootPanel = new JPanel();
-        rootWindow.add(rootPanel);
+        rootWindow.add(rootPanel, BorderLayout.CENTER);
+
+        rootWindow.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent w){
+                try {
+                    options.saveToFile();
+                    System.out.println("Save success!");
+                }
+                catch(IOException e) {
+                    //rip
+                }
+
+                System.exit(0);
+            }
+        });
 
         addGridToWindow();
+        setupToolbar();
 
         rootWindow.setVisible(true);
+    }
+
+    public static void setupToolbar() {
+        toolbar = new JToolBar();
+
+        toolbar.setLayout(new FlowLayout());
+        updateToolbar();
+        toolbar.add(minesLeft);
+
+        rootWindow.add(toolbar, BorderLayout.NORTH);
+    }
+
+    public static void updateToolbar() {
+        minesLeft.setText("Mines left: " + mineCount);
+        toolbar.repaint();
+        toolbar.revalidate();
     }
 
     public static void reveal(MSButton button) {
@@ -270,6 +329,7 @@ public class Main {
         else if(cell.getState() == Cell.State.FLAGGED) {
             cell.setState(Cell.State.QUESTIONED);
             button.setText("?");
+            incrementMinesLeft();
         }
         else if(cell.getState() == Cell.State.QUESTIONED){
             cell.setState(Cell.State.NONE);
@@ -278,6 +338,7 @@ public class Main {
         else {
             cell.setState(Cell.State.FLAGGED);
             button.setText("!");
+            decrementMinesLeft();
         }
     }
 
@@ -290,6 +351,9 @@ public class Main {
                 }
                 c.button.setText(c.toString());
             }
+        }
+        if(flagMines) {
+            setMinesLeft(0);
         }
     }
 
@@ -307,4 +371,18 @@ public class Main {
         setState(GameState.WON);
     }
 
+    public static void decrementMinesLeft() {
+        mineCount--;
+        setMinesLeft(mineCount);
+    }
+
+    public static void incrementMinesLeft() {
+        mineCount++;
+        setMinesLeft(mineCount);
+    }
+
+    public static void setMinesLeft(int mines) {
+        mineCount = mines;
+        updateToolbar();
+    }
 }
