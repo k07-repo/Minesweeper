@@ -34,16 +34,26 @@ public class Main {
         setupOptionsWindow();
     }
 
+    public static void newGame() {
+        grid.createGrid();
+        grid.initializeGrid();
+        addGridToWindow();
+
+        setState(GameState.ONGOING);
+    }
+
     public static void setState(GameState state) {
         gameState = state;
 
         if(gameState == GameState.LOST) {
             revealAllMines(false);
             JOptionPane.showMessageDialog(optionSetWindow, "Ba-boom!", "Better luck next time...", JOptionPane.ERROR_MESSAGE);
+            newGame();
         }
         else if(gameState == GameState.WON) {
             revealAllMines(true);
             JOptionPane.showMessageDialog(optionSetWindow, "You win!", "Congratulations!", JOptionPane.INFORMATION_MESSAGE);
+            newGame();
         }
     }
 
@@ -124,18 +134,15 @@ public class Main {
         optionSetWindow.setVisible(true);
     }
 
-
-
-    public static void setupWindow() {
-        rootWindow = new JFrame("Minesweeper");
-        rootWindow.setSize(500, 600);
-        rootPanel = new JPanel();
-        rootWindow.add(rootPanel);
+    public static void addGridToWindow() {
+        rootPanel.removeAll();
 
         int rows = Integer.parseInt(rowField.getText());
         int cols =  Integer.parseInt(colField.getText());
         int mines =  Integer.parseInt(mineField.getText());
         grid = new Grid(mines, rows, cols);
+        grid.createGrid();
+        grid.initializeGrid();
         rootPanel.setLayout(new GridLayout(rows, cols));
 
         for(int row = 0; row < rows; row++) {
@@ -189,8 +196,23 @@ public class Main {
                 rootPanel.add(button);
             }
         }
+
+        //Redraw and refresh the grid after the new one is created
+        rootPanel.repaint();
+        rootPanel.revalidate();
+    }
+
+    public static void setupWindow() {
+        rootWindow = new JFrame("Minesweeper");
+        rootWindow.setSize(500, 600);
+        rootPanel = new JPanel();
+        rootWindow.add(rootPanel);
+
+        addGridToWindow();
+
         rootWindow.setVisible(true);
     }
+
     public static void reveal(MSButton button) {
         Cell cell = button.cell;
         Cell.State state = cell.getState();

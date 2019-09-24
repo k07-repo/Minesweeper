@@ -20,10 +20,6 @@ public class Grid {
         this.random = new Random();
 
         grid = new Cell[rows][cols];
-
-        createGrid();
-        initializeGrid();
-        printGrid();
     }
 
 
