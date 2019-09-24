@@ -4,22 +4,22 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
-public class MinesweeperGrid {
+public class Grid {
     private int numberOfMines;
     private int rows;
     private int cols;
     private Random random;
 
-    public MinesweeperCell[][] grid;
+    public Cell[][] grid;
 
-    public MinesweeperGrid(int mines, int rows, int cols)
+    public Grid(int mines, int rows, int cols)
     {
         this.numberOfMines = mines;
         this.rows = rows;
         this.cols = cols;
         this.random = new Random();
 
-        grid = new MinesweeperCell[rows][cols];
+        grid = new Cell[rows][cols];
 
         createGrid();
         initializeGrid();
@@ -29,10 +29,10 @@ public class MinesweeperGrid {
 
     public void createGrid() {
 
-        ArrayList<MinesweeperCell> mineArray = new ArrayList<MinesweeperCell>();
+        ArrayList<Cell> mineArray = new ArrayList<Cell>();
 
         for(int k = 0; k < rows * cols; k++) {
-            MinesweeperCell newCell = new MinesweeperCell();
+            Cell newCell = new Cell();
             if(k < numberOfMines) {
                 newCell.setMine();
             }
@@ -49,7 +49,7 @@ public class MinesweeperGrid {
     public void initializeGrid() {
         for(int row = 0; row < rows; row++) {
             for(int col = 0; col < cols; col++) {
-                MinesweeperCell current = getCellAt(row, col);
+                Cell current = getCellAt(row, col);
                 if(!current.isMine()) {
                    current.setNumber(getNumberOfAdjacentMines(row, col));
                 }
@@ -57,7 +57,7 @@ public class MinesweeperGrid {
         }
     }
 
-    public void setCellNumber(MinesweeperCell cell) {
+    public void setCellNumber(Cell cell) {
         if(!cell.isMine()) {
             cell.setNumber(getNumberOfAdjacentMines(cell.row, cell.column));
         }
@@ -72,24 +72,24 @@ public class MinesweeperGrid {
         }
     }
 
-    public MinesweeperCell getRandomSafeCell() {
+    public Cell getRandomSafeCell() {
          printGrid();
          while (true) {
-            MinesweeperCell result = this.getCellAt(random.nextInt(rows), random.nextInt(cols));
+            Cell result = this.getCellAt(random.nextInt(rows), random.nextInt(cols));
             if (!result.isMine()) {
                 return result;
             }
         }
     }
 
-    public MinesweeperCell getCellAt(int row, int col) {
+    public Cell getCellAt(int row, int col) {
         return grid[row][col];
     }
 
     public int getNumberOfAdjacentMines(int row, int col) {
         int result = 0;
-        ArrayList<MinesweeperCell> adjacent = getAdjacentCells(row, col);
-        for(MinesweeperCell cell: adjacent) {
+        ArrayList<Cell> adjacent = getAdjacentCells(row, col);
+        for(Cell cell: adjacent) {
             if(cell.isMine()) {
                 result++;
             }
@@ -98,8 +98,8 @@ public class MinesweeperGrid {
         return result;
     }
 
-    public ArrayList<MinesweeperCell> getAdjacentCells(int r, int c) {
-        ArrayList<MinesweeperCell> result = new ArrayList<>();
+    public ArrayList<Cell> getAdjacentCells(int r, int c) {
+        ArrayList<Cell> result = new ArrayList<>();
 
         for(int row = -1; row < 2; row++) {
             for(int col = -1; col < 2; col++) {
@@ -114,8 +114,8 @@ public class MinesweeperGrid {
         return result;
     }
 
-    public ArrayList<MinesweeperCell> getAllCells() {
-        ArrayList<MinesweeperCell> result = new ArrayList<>();
+    public ArrayList<Cell> getAllCells() {
+        ArrayList<Cell> result = new ArrayList<>();
         for(int row = 0; row < rows; row++) {
             for(int col = 0; col < cols; col++) {
                 result.add(grid[row][col]);

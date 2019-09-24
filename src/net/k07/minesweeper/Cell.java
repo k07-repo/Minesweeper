@@ -1,12 +1,12 @@
 package net.k07.minesweeper;
 
-public class MinesweeperCell {
+public class Cell {
 
     enum State {
         NONE, REVEALED, QUESTIONED, FLAGGED
     }
 
-    public MinesweeperButton button;
+    public MSButton button;
     public int row;
     public int column;
 
@@ -15,7 +15,7 @@ public class MinesweeperCell {
 
     private int number;
     private State state;
-    public MinesweeperCell() {
+    public Cell() {
         this.number = UNINITIALIZED;
         this.button = null;
         this.state = State.NONE;
@@ -29,7 +29,7 @@ public class MinesweeperCell {
         this.state = state;
     }
 
-    public void setButton(MinesweeperButton b) {
+    public void setButton(MSButton b) {
         if(this.button == null) {
             this.button = b;
         }
