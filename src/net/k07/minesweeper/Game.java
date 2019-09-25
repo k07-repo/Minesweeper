@@ -1,0 +1,177 @@
+package net.k07.minesweeper;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
+import static net.k07.minesweeper.Main.timeLabel;
+
+public class Game {
+
+    enum GameState {
+        ONGOING, LOST, WON;
+    }
+
+    public static GameState gameState = GameState.ONGOING;
+    public static Grid grid;
+    public static int mineCount = -1;
+    public static int timePassed = 0;
+    public static boolean firstClick = false;
+
+    public static Timer timer = new Timer(1000, new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            timePassed++;
+            timeLabel.setText("Time passed: " + timePassed);
+        }
+    });
+
+    public void newGame() {
+        timer.stop();
+        Main.pressedButton = null;
+        grid.createGrid();
+        grid.initializeGrid();
+        Main.addGridToWindow();
+        setMinesLeft(mineCount);
+        timePassed = 0;
+        firstClick = true;
+        Main.updateToolbar();
+        setState(GameState.ONGOING);
+    }
+
+    public void setState(GameState state) {
+        gameState = state;
+
+        if(gameState == GameState.LOST) {
+            timer.stop();
+            revealAllMines(false);
+            JOptionPane.showMessageDialog(Main.rootWindow, "Ba-boom!", "Better luck next time...", JOptionPane.ERROR_MESSAGE);
+        }
+        else if(gameState == GameState.WON) {
+            timer.stop();
+            revealAllMines(true);
+            JOptionPane.showMessageDialog(Main.rootWindow, "You win!", "Congratulations!", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+
+    public void reveal(MSButton button) {
+        Cell cell = button.cell;
+        Cell.State state = cell.getState();
+        if(state == Cell.State.NONE || state == Cell.State.QUESTIONED) {
+            cell.setState(Cell.State.NONE);
+            button.setText(cell.toString());
+            button.setEnabled(false);
+            cell.setState(Cell.State.REVEALED);
+
+            if(firstClick) {
+                timer.start();
+                firstClick = false;
+                System.out.println("first click");
+            }
+
+            if (cell.getNumber() == 0) {
+                button.setBackground(new Color(40, 40, 40));
+                revealAllAdjacent(button);
+            }
+            else if(cell.isMine()) {
+                if(gameState == GameState.ONGOING) {
+                    setState(GameState.LOST);
+                }
+            }
+
+            checkForWin();
+        }
+    }
+
+    public void revealAllAdjacent(MSButton button) {
+        ArrayList<Cell> adjacentCells = grid.getAdjacentCells(button.row, button.col);
+        System.out.println(adjacentCells);
+        for (Cell c : adjacentCells) {
+            reveal(c.button);
+        }
+    }
+
+    public void revealAllAdjacentWithFlagCheck(MSButton button) {
+        ArrayList<Cell> adjacentCells = grid.getAdjacentCells(button.row, button.col);
+        System.out.println(adjacentCells);
+        int flagCount = 0;
+        for (Cell c : adjacentCells) {
+            if(c.getState() == Cell.State.FLAGGED) {
+                flagCount++;
+            }
+        }
+
+        if(flagCount == button.cell.getNumber()) {
+            for (Cell c : adjacentCells) {
+                reveal(c.button);
+            }
+        }
+    }
+
+    public void rotateFlagState(MSButton button) {
+        Cell cell = button.cell;
+        if(cell.getState() == Cell.State.REVEALED) {
+            return;
+        }
+        else if(cell.getState() == Cell.State.FLAGGED) {
+            cell.setState(Cell.State.QUESTIONED);
+            button.setText("?");
+            incrementMinesLeft();
+        }
+        else if(cell.getState() == Cell.State.QUESTIONED){
+            cell.setState(Cell.State.NONE);
+            button.setText("");
+        }
+        else {
+            cell.setState(Cell.State.FLAGGED);
+            button.setText("!");
+            decrementMinesLeft();
+        }
+    }
+
+    public void revealAllMines(boolean flagMines) {
+        for(Cell c: grid.getAllCells()) {
+            Cell.State state = c.getState();
+            if(c.isMine() && state != Cell.State.FLAGGED && state != Cell.State.REVEALED) {
+                if(flagMines) {
+                    c.setState(Cell.State.FLAGGED);
+                }
+                c.button.setText(c.toString());
+            }
+        }
+        if(flagMines) {
+            setMinesLeft(0);
+        }
+    }
+
+    public void checkForWin() {
+        if (!(gameState == GameState.ONGOING)) {
+            return;
+        }
+
+        for (Cell c : grid.getAllCells()) {
+            Cell.State state = c.getState();
+            if (state != Cell.State.REVEALED && !c.isMine())
+                return;
+        }
+
+        setState(GameState.WON);
+    }
+
+    public static void decrementMinesLeft() {
+        mineCount--;
+        setMinesLeft(mineCount);
+    }
+
+    public static void incrementMinesLeft() {
+        mineCount++;
+        setMinesLeft(mineCount);
+    }
+
+    public static void setMinesLeft(int mines) {
+        mineCount = mines;
+        Main.updateToolbar();
+    }
+}

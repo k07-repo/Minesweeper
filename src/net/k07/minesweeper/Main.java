@@ -12,11 +12,6 @@ public class Main {
     private static final int DEFAULT_COLS = 16;
     private static final int DEFAULT_MINES = 40;
 
-    enum GameState {
-        ONGOING, LOST, WON
-    }
-
-    public static Grid grid;
     public static MSButton pressedButton;
 
     public static JFrame rootWindow;
@@ -34,25 +29,19 @@ public class Main {
     public static JTextField colField = new JTextField();
     public static JTextField mineField = new JTextField();
 
-    public static GameState gameState = GameState.ONGOING;
-
     public static boolean firstClick = false;
 
     public static int rows = -1;
     public static int cols = -1;
     public static int mines = -1;
 
-    public static int mineCount = -1;
-    public static int timePassed = 0;
     public static Options options = new Options();
-    public static Timer timer = new Timer(1000, new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            timePassed++;
-            timeLabel.setText("Time passed: " + timePassed);
-        }
-    });
+
+    public static Game game;
 
     public static void main(String[] args) throws Exception {
+
+        game = new Game();
         pressedButton = null;
         firstClick = true;
 
@@ -68,34 +57,6 @@ public class Main {
         }
 
         setupWindow();
-    }
-
-    public static void newGame() {
-        timer.stop();
-        pressedButton = null;
-        grid.createGrid();
-        grid.initializeGrid();
-        addGridToWindow();
-        setMinesLeft(mineCount);
-        timePassed = 0;
-        firstClick = true;
-        updateToolbar();
-        setState(GameState.ONGOING);
-    }
-
-    public static void setState(GameState state) {
-        gameState = state;
-
-        if(gameState == GameState.LOST) {
-            timer.stop();
-            revealAllMines(false);
-            JOptionPane.showMessageDialog(optionSetWindow, "Ba-boom!", "Better luck next time...", JOptionPane.ERROR_MESSAGE);
-        }
-        else if(gameState == GameState.WON) {
-            timer.stop();
-            revealAllMines(true);
-            JOptionPane.showMessageDialog(optionSetWindow, "You win!", "Congratulations!", JOptionPane.INFORMATION_MESSAGE);
-        }
     }
 
     public static boolean validateInput(JTextField field, String fieldName, int min, int max) {
@@ -173,7 +134,7 @@ public class Main {
                 options.columns = cols;
                 options.mines = mines;
 
-                newGame();
+                game.newGame();
                 optionSetWindow.dispatchEvent(new WindowEvent(optionSetWindow, WindowEvent.WINDOW_CLOSING));
             }
         });
@@ -187,16 +148,16 @@ public class Main {
 
     public static void addGridToWindow() {
         rootPanel.removeAll();
-        mineCount = mines;
-        grid = new Grid(mines, rows, cols);
-        grid.createGrid();
-        grid.initializeGrid();
+        game.mineCount = mines;
+        game.grid = new Grid(mines, rows, cols);
+        game.grid.createGrid();
+        game.grid.initializeGrid();
         rootPanel.setLayout(new GridLayout(rows, cols));
 
         for(int row = 0; row < rows; row++) {
             for(int col = 0; col < cols; col++) {
                 MSButton button = new MSButton("", row, col);
-                Cell cell = grid.getCellAt(row, col);
+                Cell cell = game.grid.getCellAt(row, col);
                 cell.setButton(button);
                 button.setCell(cell);
 
@@ -208,20 +169,20 @@ public class Main {
                         pressedButton = button;
                     }
                     public void mouseReleased(MouseEvent e) {
-                        if(gameState == GameState.ONGOING) {
+                        if(game.gameState == Game.GameState.ONGOING) {
                             if (button == pressedButton) {
                                 if (SwingUtilities.isLeftMouseButton(e) && SwingUtilities.isRightMouseButton(e)) {
                                     if (!button.isEnabled() && button.cell.getState() == Cell.State.REVEALED) {
-                                        revealAllAdjacentWithFlagCheck(button);
+                                        game.revealAllAdjacentWithFlagCheck(button);
                                     }
                                 } else if (button.isEnabled()) {
                                     if (SwingUtilities.isLeftMouseButton(e)) {
                                         if (!(button.cell.getState() == Cell.State.FLAGGED)) {
-                                            reveal(button);
+                                            game.reveal(button);
                                         }
                                     } else if (SwingUtilities.isRightMouseButton(e)) {
                                         if (!(button.cell.getState() == Cell.State.REVEALED)) {
-                                            rotateFlagState(button);
+                                            game.rotateFlagState(button);
                                         }
                                     }
                                 }
@@ -285,7 +246,7 @@ public class Main {
         newGameButton = new JButton("New Game");
         newGameButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                newGame();
+                game.newGame();
             }
         });
         toolbar.add(newGameButton);
@@ -303,128 +264,11 @@ public class Main {
     }
 
     public static void updateToolbar() {
-        minesLeft.setText("Mines left: " + mineCount);
-        timeLabel.setText("Time passed: " + timePassed);
+        minesLeft.setText("Mines left: " + game.mineCount);
+        timeLabel.setText("Time passed: " + game.timePassed);
         toolbar.repaint();
         toolbar.revalidate();
     }
 
-    public static void reveal(MSButton button) {
-        Cell cell = button.cell;
-        Cell.State state = cell.getState();
-        if(state == Cell.State.NONE || state == Cell.State.QUESTIONED) {
-            cell.setState(Cell.State.NONE);
-            button.setText(cell.toString());
-            button.setEnabled(false);
-            cell.setState(Cell.State.REVEALED);
 
-            if(firstClick) {
-                timer.start();
-                firstClick = false;
-                System.out.println("first click");
-            }
-
-            if (cell.getNumber() == 0) {
-                button.setBackground(new Color(40, 40, 40));
-                revealAllAdjacent(button);
-            }
-            else if(cell.isMine()) {
-                if(gameState == GameState.ONGOING) {
-                    setState(GameState.LOST);
-                }
-            }
-
-            checkForWin();
-        }
-    }
-
-    public static void revealAllAdjacent(MSButton button) {
-        ArrayList<Cell> adjacentCells = grid.getAdjacentCells(button.row, button.col);
-        System.out.println(adjacentCells);
-        for (Cell c : adjacentCells) {
-            reveal(c.button);
-        }
-    }
-
-    public static void revealAllAdjacentWithFlagCheck(MSButton button) {
-        ArrayList<Cell> adjacentCells = grid.getAdjacentCells(button.row, button.col);
-        System.out.println(adjacentCells);
-        int flagCount = 0;
-        for (Cell c : adjacentCells) {
-            if(c.getState() == Cell.State.FLAGGED) {
-                flagCount++;
-            }
-        }
-
-        if(flagCount == button.cell.getNumber()) {
-            for (Cell c : adjacentCells) {
-                reveal(c.button);
-            }
-        }
-    }
-
-    public static void rotateFlagState(MSButton button) {
-        Cell cell = button.cell;
-        if(cell.getState() == Cell.State.REVEALED) {
-            return;
-        }
-        else if(cell.getState() == Cell.State.FLAGGED) {
-            cell.setState(Cell.State.QUESTIONED);
-            button.setText("?");
-            incrementMinesLeft();
-        }
-        else if(cell.getState() == Cell.State.QUESTIONED){
-            cell.setState(Cell.State.NONE);
-            button.setText("");
-        }
-        else {
-            cell.setState(Cell.State.FLAGGED);
-            button.setText("!");
-            decrementMinesLeft();
-        }
-    }
-
-    public static void revealAllMines(boolean flagMines) {
-        for(Cell c: grid.getAllCells()) {
-            Cell.State state = c.getState();
-            if(c.isMine() && state != Cell.State.FLAGGED && state != Cell.State.REVEALED) {
-                if(flagMines) {
-                    c.setState(Cell.State.FLAGGED);
-                }
-                c.button.setText(c.toString());
-            }
-        }
-        if(flagMines) {
-            setMinesLeft(0);
-        }
-    }
-
-    public static void checkForWin() {
-        if (!(gameState == GameState.ONGOING)) {
-            return;
-        }
-
-        for (Cell c : grid.getAllCells()) {
-            Cell.State state = c.getState();
-            if (state != Cell.State.REVEALED && !c.isMine())
-                return;
-        }
-
-        setState(GameState.WON);
-    }
-
-    public static void decrementMinesLeft() {
-        mineCount--;
-        setMinesLeft(mineCount);
-    }
-
-    public static void incrementMinesLeft() {
-        mineCount++;
-        setMinesLeft(mineCount);
-    }
-
-    public static void setMinesLeft(int mines) {
-        mineCount = mines;
-        updateToolbar();
-    }
 }
