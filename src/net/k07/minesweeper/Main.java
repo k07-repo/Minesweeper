@@ -6,7 +6,6 @@ import java.awt.event.*;
 import java.io.IOException;
 import java.util.ArrayList;
 
-
 public class Main {
 
     enum GameState {
@@ -21,7 +20,11 @@ public class Main {
     public static JToolBar toolbar;
     public static JFrame optionSetWindow;
 
+    public static JButton newGameButton;
+    public static JButton optionsButton;
+
     public static JLabel minesLeft = new JLabel();
+    public static JLabel timeLabel = new JLabel();
 
     public static JTextField rowField = new JTextField();
     public static JTextField colField = new JTextField();
@@ -34,9 +37,16 @@ public class Main {
     public static int rows = -1;
     public static int cols = -1;
     public static int mines = -1;
-    public static int mineCount = -1;
 
+    public static int mineCount = -1;
+    public static int timePassed = 0;
     public static Options options = new Options();
+    public static Timer timer = new Timer(1000, new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            timePassed++;
+            timeLabel.setText("Time passed: " + timePassed);
+        }
+    });
     public static void main(String[] args) throws Exception {
         pressedButton = null;
         firstClick = true;
@@ -53,11 +63,15 @@ public class Main {
     }
 
     public static void newGame() {
+        timer.stop();
+        pressedButton = null;
         grid.createGrid();
         grid.initializeGrid();
         addGridToWindow();
         setMinesLeft(mineCount);
-
+        timePassed = 0;
+        firstClick = true;
+        updateToolbar();
         setState(GameState.ONGOING);
     }
 
@@ -65,14 +79,14 @@ public class Main {
         gameState = state;
 
         if(gameState == GameState.LOST) {
+            timer.stop();
             revealAllMines(false);
             JOptionPane.showMessageDialog(optionSetWindow, "Ba-boom!", "Better luck next time...", JOptionPane.ERROR_MESSAGE);
-            newGame();
         }
         else if(gameState == GameState.WON) {
+            timer.stop();
             revealAllMines(true);
             JOptionPane.showMessageDialog(optionSetWindow, "You win!", "Congratulations!", JOptionPane.INFORMATION_MESSAGE);
-            newGame();
         }
     }
 
@@ -186,7 +200,6 @@ public class Main {
                         pressedButton = button;
                     }
                     public void mouseReleased(MouseEvent e) {
-
                         if(gameState == GameState.ONGOING) {
                             if (button == pressedButton) {
                                 if (SwingUtilities.isLeftMouseButton(e) && SwingUtilities.isRightMouseButton(e)) {
@@ -261,13 +274,26 @@ public class Main {
 
         toolbar.setLayout(new FlowLayout());
         updateToolbar();
+        newGameButton = new JButton("New Game");
+        newGameButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                newGame();
+            }
+        });
+        toolbar.add(newGameButton);
         toolbar.add(minesLeft);
+        toolbar.add(timeLabel);
+
+
+
+
 
         rootWindow.add(toolbar, BorderLayout.NORTH);
     }
 
     public static void updateToolbar() {
         minesLeft.setText("Mines left: " + mineCount);
+        timeLabel.setText("Time passed: " + timePassed);
         toolbar.repaint();
         toolbar.revalidate();
     }
@@ -279,6 +305,13 @@ public class Main {
             button.setText(cell.toString());
             button.setEnabled(false);
             cell.setState(Cell.State.REVEALED);
+
+            if(firstClick) {
+                timer.start();
+                firstClick = false;
+                System.out.println("first click");
+            }
+
             if (cell.getNumber() == 0) {
                 button.setBackground(new Color(40, 40, 40));
                 revealAllAdjacent(button);
@@ -289,9 +322,6 @@ public class Main {
                 }
             }
 
-            if(firstClick) {
-                firstClick = false;
-            }
             checkForWin();
         }
     }
