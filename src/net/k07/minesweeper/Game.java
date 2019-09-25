@@ -6,12 +6,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-import static net.k07.minesweeper.Main.timeLabel;
-
 public class Game {
 
     enum GameState {
-        ONGOING, LOST, WON;
+        ONGOING, LOST, WON
     }
 
     public static GameState gameState = GameState.ONGOING;
@@ -23,7 +21,7 @@ public class Game {
     public static Timer timer = new Timer(1000, new ActionListener() {
         public void actionPerformed(ActionEvent e) {
             timePassed++;
-            timeLabel.setText("Time passed: " + timePassed);
+            Main.timeLabel.setText("Time passed: " + timePassed);
         }
     });
 
