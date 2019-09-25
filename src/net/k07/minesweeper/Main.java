@@ -8,6 +8,10 @@ import java.util.ArrayList;
 
 public class Main {
 
+    private static final int DEFAULT_ROWS = 16;
+    private static final int DEFAULT_COLS = 16;
+    private static final int DEFAULT_MINES = 40;
+
     enum GameState {
         ONGOING, LOST, WON
     }
@@ -47,6 +51,7 @@ public class Main {
             timeLabel.setText("Time passed: " + timePassed);
         }
     });
+
     public static void main(String[] args) throws Exception {
         pressedButton = null;
         firstClick = true;
@@ -55,11 +60,14 @@ public class Main {
             rows = options.rows;
             cols = options.columns;
             mines = options.mines;
-            setupWindow();
         }
         else {
-            setupOptionsWindow();
+            rows = DEFAULT_ROWS;
+            cols = DEFAULT_COLS;
+            mines = DEFAULT_MINES;
         }
+
+        setupWindow();
     }
 
     public static void newGame() {
@@ -165,13 +173,13 @@ public class Main {
                 options.columns = cols;
                 options.mines = mines;
 
-                setupWindow();
+                newGame();
                 optionSetWindow.dispatchEvent(new WindowEvent(optionSetWindow, WindowEvent.WINDOW_CLOSING));
             }
         });
 
         optionSetWindow.add(playButton);
-        optionSetWindow.setSize(250, 250);
+        optionSetWindow.setSize(125, 175);
         optionSetWindow.setResizable(false);
         optionSetWindow.setLocationRelativeTo(null);
         optionSetWindow.setVisible(true);
@@ -284,10 +292,13 @@ public class Main {
         toolbar.add(minesLeft);
         toolbar.add(timeLabel);
 
-
-
-
-
+        optionsButton = new JButton("Options");
+        optionsButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                setupOptionsWindow();
+            }
+        });
+        toolbar.add(optionsButton);
         rootWindow.add(toolbar, BorderLayout.NORTH);
     }
 
@@ -302,6 +313,7 @@ public class Main {
         Cell cell = button.cell;
         Cell.State state = cell.getState();
         if(state == Cell.State.NONE || state == Cell.State.QUESTIONED) {
+            cell.setState(Cell.State.NONE);
             button.setText(cell.toString());
             button.setEnabled(false);
             cell.setState(Cell.State.REVEALED);
