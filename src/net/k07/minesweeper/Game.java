@@ -53,7 +53,6 @@ public class Game {
         }
     }
 
-
     public void reveal(MSButton button) {
         Cell cell = button.cell;
         Cell.State state = cell.getState();
@@ -66,7 +65,6 @@ public class Game {
             if(firstClick) {
                 timer.start();
                 firstClick = false;
-                System.out.println("first click");
             }
 
             if (cell.getNumber() == 0) {
@@ -85,7 +83,6 @@ public class Game {
 
     public void revealAllAdjacent(MSButton button) {
         ArrayList<Cell> adjacentCells = grid.getAdjacentCells(button.row, button.col);
-        System.out.println(adjacentCells);
         for (Cell c : adjacentCells) {
             reveal(c.button);
         }
@@ -93,7 +90,6 @@ public class Game {
 
     public void revealAllAdjacentWithFlagCheck(MSButton button) {
         ArrayList<Cell> adjacentCells = grid.getAdjacentCells(button.row, button.col);
-        System.out.println(adjacentCells);
         int flagCount = 0;
         for (Cell c : adjacentCells) {
             if(c.getState() == Cell.State.FLAGGED) {

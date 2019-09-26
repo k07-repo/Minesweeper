@@ -7,10 +7,7 @@ public class Options implements Serializable {
     public int rows;
     public int columns;
     public int mines;
-    public String filename = "options";
-
-    public Options() {
-    }
+    private String filename = "options";
 
     public void saveToFile() throws IOException {
         try {
@@ -29,15 +26,10 @@ public class Options implements Serializable {
             Options temp = (Options)in.readObject();
             in.close();
 
-            System.out.println(temp.rows + " " + temp.columns + " " + temp.mines);
-            System.out.println(this.rows + " " + this.columns + " " + this.mines);
-
             this.rows = temp.rows;
             this.columns = temp.columns;
             this.mines = temp.mines;
 
-            System.out.println(temp.rows + " " + temp.columns + " " + temp.mines);
-            System.out.println(this.rows + " " + this.columns + " " + this.mines);
             return true;
         }
         catch(IOException e) {
