@@ -22,6 +22,20 @@ public class Grid {
         grid = new Cell[rows][cols];
     }
 
+    public Cell getFirstSafeCell() {
+        for(int row = 0; row < rows; row++) {
+            for(int col = 0; col < cols; col++) {
+                Cell cell = this.getCellAt(row, col);
+                System.out.println("pass");
+                if(!(cell.isMine())) {
+                    return cell;
+                }
+            }
+        }
+
+        //should never be reached
+        return null;
+    }
 
     public void createGrid() {
 
@@ -37,19 +51,28 @@ public class Grid {
 
         Collections.shuffle(mineArray);
 
-        for(int k = 0; k < mineArray.size(); k++) {
-            grid[k / cols][k % cols] = mineArray.get(k);
+        for(int row = 0; row < rows; row++) {
+            for(int col = 0; col < cols; col++) {
+                Cell cell = mineArray.get((row * rows) + col);
+                cell.row = row;
+                cell.column = col;
+                grid[row][col] = cell;
+            }
         }
     }
 
     public void initializeGrid() {
         for(int row = 0; row < rows; row++) {
             for(int col = 0; col < cols; col++) {
-                Cell current = getCellAt(row, col);
-                if(!current.isMine()) {
-                   current.setNumber(getNumberOfAdjacentMines(row, col));
-                }
+                initializeCell(row, col);
             }
+        }
+    }
+
+    public void initializeCell(int row, int col) {
+        Cell current = getCellAt(row, col);
+        if(!current.isMine()) {
+            current.setNumber(getNumberOfAdjacentMines(row, col));
         }
     }
 
@@ -69,7 +92,7 @@ public class Grid {
     }
 
     public Cell getRandomSafeCell() {
-         printGrid();
+
          while (true) {
             Cell result = this.getCellAt(random.nextInt(rows), random.nextInt(cols));
             if (!result.isMine()) {

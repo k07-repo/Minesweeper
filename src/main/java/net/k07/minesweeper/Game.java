@@ -16,7 +16,7 @@ public class Game {
     public static Grid grid;
     public static int mineCount = -1;
     public static int timePassed = 0;
-    public static boolean firstClick = false;
+    public static boolean firstClick = true;
 
     public static Timer timer = new Timer(1000, new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -62,20 +62,38 @@ public class Game {
             button.setEnabled(false);
             cell.setState(Cell.State.REVEALED);
 
-            if(firstClick) {
-                timer.start();
-                firstClick = false;
+            if(cell.isMine()) {
+                if(firstClick) {
+                    Cell safe = grid.getFirstSafeCell();
+                    safe.setMine();
+                    cell.setNumber(grid.getNumberOfAdjacentMines(cell.row, cell.column));
+                    cell.button.setText(cell.toString());
+
+                    ArrayList<Cell> reevaluate = grid.getAdjacentCells(cell.row, cell.column);
+                    for(Cell c: reevaluate) {
+                        grid.initializeCell(c.row, c.column);
+                    }
+
+                    reevaluate = grid.getAdjacentCells(safe.row, safe.column);
+                    for(Cell c: reevaluate) {
+                        grid.initializeCell(c.row, c.column);
+                    }
+                }
+                else if(gameState == GameState.ONGOING) {
+                    setState(GameState.LOST);
+                }
             }
 
             if (cell.getNumber() == 0) {
                 button.setBackground(new Color(40, 40, 40));
                 revealAllAdjacent(button);
             }
-            else if(cell.isMine()) {
-                if(gameState == GameState.ONGOING) {
-                    setState(GameState.LOST);
-                }
+
+            if(firstClick) {
+                timer.start();
+                firstClick = false;
             }
+
 
             checkForWin();
         }

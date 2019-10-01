@@ -35,7 +35,7 @@ public class Cell {
         }
     }
     public void setMine() {
-        this.number = MINE;
+        setNumber(MINE);
     }
 
     public boolean isMine() {
@@ -48,6 +48,7 @@ public class Cell {
 
     public void setNumber(int number) {
         this.number = number;
+
     }
 
     @Override
