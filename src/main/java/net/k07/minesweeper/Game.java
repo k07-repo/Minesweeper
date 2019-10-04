@@ -44,7 +44,6 @@ public class Game {
         if(gameState == GameState.LOST) {
             timer.stop();
             revealAllMines(false);
-            JOptionPane.showMessageDialog(Main.rootWindow, "Ba-boom!", "Better luck next time...", JOptionPane.ERROR_MESSAGE);
         }
         else if(gameState == GameState.WON) {
             timer.stop();
