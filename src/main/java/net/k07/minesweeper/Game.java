@@ -2,8 +2,6 @@ package net.k07.minesweeper;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 public class Game {
@@ -17,24 +15,28 @@ public class Game {
     public static int mineCount = -1;
     public static int timePassed = 0;
     public static boolean firstClick = true;
+    
+    private static MSWindow window;
 
-    public static Timer timer = new Timer(1000, new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
+    public static Timer timer = new Timer(1000, e -> {
             timePassed++;
-            Main.timeLabel.setText("Time passed: " + timePassed);
-        }
+            window.timeLabel.setText("Time passed: " + timePassed);
     });
+    
+    public Game(MSWindow window) {
+        this.window = window;
+    }
 
     public void newGame() {
         timer.stop();
-        Main.pressedButton = null;
+        window.pressedButton = null;
         grid.createGrid();
         grid.initializeGrid();
-        Main.addGridToWindow();
+        window.addGridToWindow();
         setMinesLeft(mineCount);
         timePassed = 0;
         firstClick = true;
-        Main.updateToolbar();
+        window.updateToolbar();
         setState(GameState.ONGOING);
     }
 
@@ -48,7 +50,7 @@ public class Game {
         else if(gameState == GameState.WON) {
             timer.stop();
             revealAllMines(true);
-            JOptionPane.showMessageDialog(Main.rootWindow, "You win!", "Congratulations!", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(window.rootWindow, "You win!", "Congratulations!", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -183,6 +185,6 @@ public class Game {
 
     public static void setMinesLeft(int mines) {
         mineCount = mines;
-        Main.updateToolbar();
+        window.updateToolbar();
     }
 }
