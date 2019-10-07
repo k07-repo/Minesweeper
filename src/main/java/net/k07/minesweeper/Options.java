@@ -29,7 +29,7 @@ public class Options implements Serializable {
             this.rows = temp.rows;
             this.columns = temp.columns;
             this.mines = temp.mines;
-
+            
             return true;
         }
         catch(IOException e) {

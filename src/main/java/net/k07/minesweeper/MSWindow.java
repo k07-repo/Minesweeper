@@ -17,20 +17,15 @@ public class MSWindow extends JFrame {
     public static MSButton pressedButton;
 
     public static JFrame rootWindow;
-    public static JFrame optionSetWindow;
-
-    public static JButton newGameButton;
-    public static JButton optionsButton;
 
     public static JLabel minesLeft = new JLabel();
     public static JLabel timeLabel = new JLabel();
 
-
     public static boolean firstClick = false;
 
-    public static int rows = -1;
-    public static int cols = -1;
-    public static int mines = -1;
+    public static int rows;
+    public static int cols;
+    public static int mines;
 
     public static Options options = new Options();
     public static Game game;
@@ -48,6 +43,10 @@ public class MSWindow extends JFrame {
             rows = DEFAULT_ROWS;
             cols = DEFAULT_COLS;
             mines = DEFAULT_MINES;
+
+            options.rows = DEFAULT_ROWS;
+            options.columns = DEFAULT_COLS;
+            options.mines = DEFAULT_MINES;
         }
 
         this.setTitle("Minesweeper");
@@ -62,10 +61,9 @@ public class MSWindow extends JFrame {
             public void windowClosing(WindowEvent w){
                 try {
                     options.saveToFile();
-                    System.out.println("Save success!");
                 }
                 catch(IOException e) {
-                    //rip
+                    JOptionPane.showMessageDialog(null, "Error saving options!", "Error", JOptionPane.ERROR_MESSAGE);
                 }
 
                 System.exit(0);
@@ -85,11 +83,10 @@ public class MSWindow extends JFrame {
         updateToolbar();
 
         JButton newGameButton = new JButton("New Game");
-        newGameButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                game.newGame();
-            }
+        newGameButton.addActionListener(e -> {
+            game.newGame();
         });
+
         this.toolbar.add(newGameButton);
         this.toolbar.add(minesLeft);
         this.toolbar.add(timeLabel);
