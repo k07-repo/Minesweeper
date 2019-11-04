@@ -30,7 +30,22 @@ public class MSWindow extends JFrame {
     public static Options options = new Options();
     public static Game game;
 
+    public static AudioPlayer explosionPlayer;
+    public static AudioPlayer tickPlayer;
+
     public MSWindow() {
+
+        try {
+            explosionPlayer = new AudioPlayer("explosion.wav");
+            explosionPlayer.soften(30.0F);
+            tickPlayer = new AudioPlayer("tick.wav");
+        }
+        catch(Exception e) {
+            //issue loading sound files
+            for(StackTraceElement element: e.getStackTrace())
+            System.out.println(element.toString());
+            System.exit(0); //temporary
+        }
 
         game = new Game(this);
 

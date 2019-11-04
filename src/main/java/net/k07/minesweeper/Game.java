@@ -21,6 +21,7 @@ public class Game {
     public static Timer timer = new Timer(1000, e -> {
             timePassed++;
             window.timeLabel.setText("Time passed: " + timePassed);
+            window.tickPlayer.start();
     });
     
     public Game(MSWindow window) {
@@ -46,6 +47,7 @@ public class Game {
         if(gameState == GameState.LOST) {
             timer.stop();
             revealAllMines(false);
+            window.explosionPlayer.start();
         }
         else if(gameState == GameState.WON) {
             timer.stop();
