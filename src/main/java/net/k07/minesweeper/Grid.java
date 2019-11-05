@@ -53,7 +53,7 @@ public class Grid {
 
         for(int row = 0; row < rows; row++) {
             for(int col = 0; col < cols; col++) {
-                Cell cell = mineArray.get((row * rows) + col);
+                Cell cell = mineArray.get(col % cols + row * cols);
                 cell.row = row;
                 cell.column = col;
                 grid[row][col] = cell;
