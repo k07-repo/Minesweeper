@@ -1,6 +1,7 @@
 package net.k07.minesweeper;
 
 import javax.swing.*;
+import javax.swing.plaf.metal.MetalButtonUI;
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -21,7 +22,10 @@ public class Game {
     public static Timer timer = new Timer(1000, e -> {
             timePassed++;
             window.timeLabel.setText("Time passed: " + timePassed);
-            window.tickPlayer.start();
+
+            if(MSWindow.soundEnabled) {
+                window.tickPlayer.start();
+            }
     });
     
     public Game(MSWindow window) {
@@ -47,7 +51,10 @@ public class Game {
         if(gameState == GameState.LOST) {
             timer.stop();
             revealAllMines(false);
-            window.explosionPlayer.start();
+
+            if(MSWindow.soundEnabled) {
+                window.explosionPlayer.start();
+            }
         }
         else if(gameState == GameState.WON) {
             timer.stop();
@@ -62,7 +69,15 @@ public class Game {
         if(state == Cell.State.NONE || state == Cell.State.QUESTIONED) {
             cell.setState(Cell.State.NONE);
             button.setText(cell.toString());
+            if(MSWindow.colorEnabled) {
+                button.setUI(new MetalButtonUI() {
+                    protected Color getDisabledTextColor() {
+                        return MSButton.getColorForNumber(cell.getNumber());
+                    }
+                });
+            }
             button.setEnabled(false);
+            button.setForeground(MSButton.getColorForNumber(cell.getNumber()));
             cell.setState(Cell.State.REVEALED);
 
             if(cell.isMine()) {

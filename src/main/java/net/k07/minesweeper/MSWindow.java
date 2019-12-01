@@ -27,6 +27,9 @@ public class MSWindow extends JFrame {
     public static int cols;
     public static int mines;
 
+    public static boolean soundEnabled;
+    public static boolean colorEnabled;
+
     public static Options options = new Options();
     public static Game game;
 
@@ -53,15 +56,21 @@ public class MSWindow extends JFrame {
             rows = options.rows;
             cols = options.columns;
             mines = options.mines;
+            soundEnabled = options.soundEnabled;
+            colorEnabled = options.colorEnabled;
         }
         else {
             rows = DEFAULT_ROWS;
             cols = DEFAULT_COLS;
             mines = DEFAULT_MINES;
+            soundEnabled = true;
+            colorEnabled = true;
 
             options.rows = DEFAULT_ROWS;
             options.columns = DEFAULT_COLS;
             options.mines = DEFAULT_MINES;
+            options.soundEnabled = true;
+            options.colorEnabled = true;
         }
 
         this.setTitle("Minesweeper");

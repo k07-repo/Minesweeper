@@ -18,7 +18,7 @@ public class OptionsWindow extends JFrame {
         this.parent = parent;
 
         this.setTitle("Options");
-        this.setLayout(new GridLayout(5, 1));
+        this.setLayout(new GridLayout(7, 1));
 
         JPanel sub1 = new JPanel();
         JPanel sub2 = new JPanel();
@@ -42,6 +42,12 @@ public class OptionsWindow extends JFrame {
         sub3.add(mineField);
         this.add(sub3);
 
+        JCheckBox soundBox = new JCheckBox("Sounds");
+        this.add(soundBox);
+
+        JCheckBox colorBox = new JCheckBox("Colors");
+        this.add(colorBox);
+
         playButton.addActionListener( e -> {
                 if (!validateInput(rowField, "Rows", 5, 20)) {
                     return;
@@ -61,10 +67,14 @@ public class OptionsWindow extends JFrame {
                 parent.rows = rowsFromField;
                 parent.cols = colsFromField;
                 parent.mines = minesFromField;
+                parent.soundEnabled = soundBox.isSelected();
+                parent.colorEnabled = colorBox.isSelected();
 
                 parent.options.rows = rowsFromField;
                 parent.options.columns = colsFromField;
                 parent.options.mines = minesFromField;
+                parent.options.soundEnabled = soundBox.isSelected();
+                parent.colorEnabled = colorBox.isSelected();
 
                 parent.game.newGame();
                 this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
