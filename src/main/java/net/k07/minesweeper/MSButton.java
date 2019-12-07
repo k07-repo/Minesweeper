@@ -1,5 +1,6 @@
 package net.k07.minesweeper;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 
@@ -13,6 +14,10 @@ public class MSButton extends JButton {
         this.row = row;
         this.col = col;
         this.cell = null;
+        //this.setBackground(new Color(200, 200, 200));
+
+        Font font = this.getFont();
+        this.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
     }
 
     public void setCell(Cell cell) {
@@ -26,7 +31,7 @@ public class MSButton extends JButton {
             case 1:
                 return Color.BLUE;
             case 2:
-                return Color.GREEN;
+                return Color.GREEN.darker();
             case 3:
                 return Color.RED;
             case 4:
@@ -42,5 +47,25 @@ public class MSButton extends JButton {
             default:
                 return Color.BLACK;
         }
+    }
+
+    public void reveal() {
+        if (this.cell.isMine()) {
+            this.setMineIcon();
+        } else {
+            this.setText(this.cell.toString());
+        }
+    }
+
+    private void setMineIcon() {
+        this.setIcon(new ImageIcon(getClass().getResource("/mine.png")));
+    }
+
+    public void setFlagIcon() {
+        this.setIcon(new ImageIcon(getClass().getResource("/flag.png")));
+    }
+
+    public void unflag() {
+        this.setIcon(null);
     }
 }

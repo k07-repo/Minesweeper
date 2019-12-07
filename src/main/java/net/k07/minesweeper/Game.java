@@ -68,7 +68,7 @@ public class Game {
         Cell.State state = cell.getState();
         if(state == Cell.State.NONE || state == Cell.State.QUESTIONED) {
             cell.setState(Cell.State.NONE);
-            button.setText(cell.toString());
+            button.reveal();
             if(MSWindow.colorEnabled) {
                 button.setUI(new MetalButtonUI() {
                     protected Color getDisabledTextColor() {
@@ -85,7 +85,7 @@ public class Game {
                     Cell safe = grid.getFirstSafeCell();
                     safe.setMine();
                     cell.setNumber(grid.getNumberOfAdjacentMines(cell.row, cell.column));
-                    cell.button.setText(cell.toString());
+                    cell.button.reveal();
 
                     ArrayList<Cell> reevaluate = grid.getAdjacentCells(cell.row, cell.column);
                     for(Cell c: reevaluate) {
@@ -98,6 +98,7 @@ public class Game {
                     }
                 }
                 else if(gameState == GameState.ONGOING) {
+                    button.setBackground(Color.RED);
                     setState(GameState.LOST);
                 }
             }
@@ -147,6 +148,7 @@ public class Game {
         }
         else if(cell.getState() == Cell.State.FLAGGED) {
             cell.setState(Cell.State.QUESTIONED);
+            button.unflag();
             button.setText("?");
             incrementMinesLeft();
         }
@@ -156,7 +158,7 @@ public class Game {
         }
         else {
             cell.setState(Cell.State.FLAGGED);
-            button.setText("!");
+            button.setFlagIcon();
             decrementMinesLeft();
         }
     }
@@ -167,8 +169,11 @@ public class Game {
             if(c.isMine() && state != Cell.State.FLAGGED && state != Cell.State.REVEALED) {
                 if(flagMines) {
                     c.setState(Cell.State.FLAGGED);
+                    c.button.setFlagIcon();
                 }
-                c.button.setText(c.toString());
+                else {
+                    c.button.reveal();
+                }
             }
         }
         if(flagMines) {
