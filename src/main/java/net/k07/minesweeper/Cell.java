@@ -48,7 +48,10 @@ public class Cell {
 
     public void setNumber(int number) {
         this.number = number;
+    }
 
+    public boolean isLifelinedMine() {
+        return this.getState() == Cell.State.REVEALED && this.isMine();
     }
 
     @Override

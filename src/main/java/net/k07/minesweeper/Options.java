@@ -7,8 +7,10 @@ public class Options implements Serializable {
     public int rows;
     public int columns;
     public int mines;
+    public int lifelines;
     public boolean soundEnabled;
     public boolean colorEnabled;
+
 
     private String filename = "options";
 
@@ -32,7 +34,7 @@ public class Options implements Serializable {
             this.rows = temp.rows;
             this.columns = temp.columns;
             this.mines = temp.mines;
-
+            this.lifelines = temp.lifelines;
             this.soundEnabled = temp.soundEnabled;
             this.colorEnabled = temp.colorEnabled;
             return true;

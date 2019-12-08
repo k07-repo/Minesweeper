@@ -16,7 +16,8 @@ public class Game {
     public static int mineCount = -1;
     public static int timePassed = 0;
     public static boolean firstClick = true;
-    
+
+
     private static MSWindow window;
 
     public static Timer timer = new Timer(1000, e -> {
@@ -41,6 +42,7 @@ public class Game {
         setMinesLeft(mineCount);
         timePassed = 0;
         firstClick = true;
+        window.lifelines = window.options.lifelines;
         window.updateToolbar();
         setState(GameState.ONGOING);
     }
@@ -86,6 +88,7 @@ public class Game {
                     safe.setMine();
                     cell.setNumber(grid.getNumberOfAdjacentMines(cell.row, cell.column));
                     cell.button.reveal();
+                    cell.button.unflag();
 
                     ArrayList<Cell> reevaluate = grid.getAdjacentCells(cell.row, cell.column);
                     for(Cell c: reevaluate) {
@@ -98,8 +101,18 @@ public class Game {
                     }
                 }
                 else if(gameState == GameState.ONGOING) {
-                    button.setBackground(Color.RED);
-                    setState(GameState.LOST);
+                    if(window.lifelines > 0) {
+                        button.setEnabled(true);
+
+                        window.lifelines--;
+                        window.updateToolbar();
+                        decrementMinesLeft();
+                        button.setFlagMineIcon();
+                    }
+                    else {
+                        button.setBackground(Color.RED);
+                        setState(GameState.LOST);
+                    }
                 }
             }
 
@@ -129,7 +142,7 @@ public class Game {
         ArrayList<Cell> adjacentCells = grid.getAdjacentCells(button.row, button.col);
         int flagCount = 0;
         for (Cell c : adjacentCells) {
-            if(c.getState() == Cell.State.FLAGGED) {
+            if(c.getState() == Cell.State.FLAGGED || c.isLifelinedMine()) {
                 flagCount++;
             }
         }

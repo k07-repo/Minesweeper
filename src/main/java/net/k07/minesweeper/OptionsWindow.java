@@ -11,6 +11,7 @@ public class OptionsWindow extends JFrame {
     public static JTextField rowField = new JTextField();
     public static JTextField colField = new JTextField();
     public static JTextField mineField = new JTextField();
+    public static JTextField lifelinesField = new JTextField();
 
     private static MSWindow parent;
 
@@ -18,34 +19,46 @@ public class OptionsWindow extends JFrame {
         this.parent = parent;
 
         this.setTitle("Options");
-        this.setLayout(new GridLayout(7, 1));
+        this.setLayout(new GridLayout(8, 1));
 
         JPanel sub1 = new JPanel();
         JPanel sub2 = new JPanel();
         JPanel sub3 = new JPanel();
+        JPanel sub4 = new JPanel();
 
         JButton playButton = new JButton("Play");
         this.add(new JLabel("Set Options"));
 
         sub1.setLayout(new GridLayout(1, 2));
         sub1.add(new JLabel("Rows: "));
+        rowField.setText(parent.rows + "");
         sub1.add(rowField);
         this.add(sub1);
 
         sub2.setLayout(new GridLayout(1, 2));
         sub2.add(new JLabel("Columns: "));
+        colField.setText(parent.cols + "");
         sub2.add(colField);
         this.add(sub2);
 
         sub3.setLayout(new GridLayout(1, 2));
         sub3.add(new JLabel("Mines: "));
+        mineField.setText(parent.mines + "");
         sub3.add(mineField);
         this.add(sub3);
 
+        sub4.setLayout(new GridLayout(1, 2));
+        sub4.add(new JLabel("Lifelines: "));
+        lifelinesField.setText(parent.lifelines + "");
+        sub4.add(lifelinesField);
+        this.add(sub4);
+
         JCheckBox soundBox = new JCheckBox("Sounds");
+        soundBox.setSelected(parent.soundEnabled);
         this.add(soundBox);
 
         JCheckBox colorBox = new JCheckBox("Colors");
+        colorBox.setSelected(parent.colorEnabled);
         this.add(colorBox);
 
         playButton.addActionListener( e -> {
@@ -61,18 +74,19 @@ public class OptionsWindow extends JFrame {
                 if (!validateInput(mineField, "Mines", 1, (rowsFromField * colsFromField) - 1)) {
                     return;
                 }
-
                 int minesFromField =  Integer.parseInt(mineField.getText());
 
                 parent.rows = rowsFromField;
                 parent.cols = colsFromField;
                 parent.mines = minesFromField;
+                parent.lifelines = Integer.parseInt(lifelinesField.getText());
                 parent.soundEnabled = soundBox.isSelected();
                 parent.colorEnabled = colorBox.isSelected();
 
                 parent.options.rows = rowsFromField;
                 parent.options.columns = colsFromField;
                 parent.options.mines = minesFromField;
+                parent.options.lifelines = Integer.parseInt(lifelinesField.getText());
                 parent.options.soundEnabled = soundBox.isSelected();
                 parent.colorEnabled = colorBox.isSelected();
 

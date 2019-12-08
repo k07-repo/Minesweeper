@@ -10,6 +10,7 @@ public class MSWindow extends JFrame {
     private static final int DEFAULT_ROWS = 16;
     private static final int DEFAULT_COLS = 16;
     private static final int DEFAULT_MINES = 40;
+    private static final int DEFAULT_LIFELINES = 0;
 
     private static JPanel rootPanel;
     private static JToolBar toolbar;
@@ -20,13 +21,14 @@ public class MSWindow extends JFrame {
 
     public static JLabel minesLeft = new JLabel();
     public static JLabel timeLabel = new JLabel();
+    public static JLabel lifelinesLabel = new JLabel();
 
     public static boolean firstClick = false;
 
     public static int rows;
     public static int cols;
     public static int mines;
-
+    public static int lifelines;
     public static boolean soundEnabled;
     public static boolean colorEnabled;
 
@@ -56,6 +58,7 @@ public class MSWindow extends JFrame {
             rows = options.rows;
             cols = options.columns;
             mines = options.mines;
+            lifelines = options.lifelines;
             soundEnabled = options.soundEnabled;
             colorEnabled = options.colorEnabled;
         }
@@ -63,12 +66,14 @@ public class MSWindow extends JFrame {
             rows = DEFAULT_ROWS;
             cols = DEFAULT_COLS;
             mines = DEFAULT_MINES;
+            lifelines = DEFAULT_LIFELINES;
             soundEnabled = true;
             colorEnabled = true;
 
             options.rows = DEFAULT_ROWS;
             options.columns = DEFAULT_COLS;
             options.mines = DEFAULT_MINES;
+            options.lifelines = DEFAULT_LIFELINES;
             options.soundEnabled = true;
             options.colorEnabled = true;
         }
@@ -114,6 +119,7 @@ public class MSWindow extends JFrame {
         this.toolbar.add(newGameButton);
         this.toolbar.add(minesLeft);
         this.toolbar.add(timeLabel);
+        this.toolbar.add(lifelinesLabel);
 
         JButton optionsButton = new JButton("Options");
         optionsButton.addActionListener(e -> {
@@ -191,6 +197,7 @@ public class MSWindow extends JFrame {
     public static void updateToolbar() {
         minesLeft.setText("Mines left: " + game.mineCount);
         timeLabel.setText("Time passed: " + game.timePassed);
+        lifelinesLabel.setText("Lifelines left: " + lifelines);
         toolbar.repaint();
         toolbar.revalidate();
     }

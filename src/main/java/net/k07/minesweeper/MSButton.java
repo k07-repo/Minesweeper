@@ -58,14 +58,20 @@ public class MSButton extends JButton {
     }
 
     private void setMineIcon() {
-        this.setIcon(new ImageIcon(getClass().getResource("/mine.png")));
+        this.setIconToFileAt("/mine.png");
     }
 
     public void setFlagIcon() {
-        this.setIcon(new ImageIcon(getClass().getResource("/flag.png")));
+        this.setIconToFileAt("/flag.png");
     }
+
+    public void setFlagMineIcon() { this.setIconToFileAt("/flagmine.png"); }
 
     public void unflag() {
         this.setIcon(null);
+    }
+
+    private void setIconToFileAt(String path) {
+        this.setIcon(new ImageIcon(getClass().getResource(path)));
     }
 }
