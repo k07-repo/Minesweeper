@@ -4,6 +4,9 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Extension of JButton with extra utilities
+ */
 public class MSButton extends JButton {
     public final int row;
     public final int col;

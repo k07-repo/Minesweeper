@@ -2,6 +2,9 @@ package net.k07.minesweeper;
 
 import java.io.*;
 
+/**
+ * Serializable class for saving the options to a file so that they persist upon closing and reopening the game.
+ */
 public class Options implements Serializable {
 
     public int rows;

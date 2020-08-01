@@ -5,6 +5,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 
+/**
+ * Handles creation of the main window and of new games (includes some game logic).
+ */
 public class MSWindow extends JFrame {
 
     private static final int DEFAULT_ROWS = 16;

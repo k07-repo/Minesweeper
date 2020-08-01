@@ -5,10 +5,11 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.InputStream;
-import java.net.URL;
 
+/**
+ * Audio player class to play the sound files when necessary
+ */
 public class AudioPlayer {
     protected AudioInputStream audioInputStream;
     protected Clip clip;

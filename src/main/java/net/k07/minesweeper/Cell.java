@@ -1,5 +1,8 @@
 package net.k07.minesweeper;
 
+/**
+ * Abstraction of the cell class. Handles the state of each cell.
+ */
 public class Cell {
 
     enum State {

@@ -5,6 +5,9 @@ import javax.swing.plaf.metal.MetalButtonUI;
 import java.awt.*;
 import java.util.ArrayList;
 
+/**
+ * Handles most of the game logic
+ */
 public class Game {
 
     enum GameState {
@@ -16,7 +19,6 @@ public class Game {
     public static int mineCount = -1;
     public static int timePassed = 0;
     public static boolean firstClick = true;
-
 
     private static MSWindow window;
 

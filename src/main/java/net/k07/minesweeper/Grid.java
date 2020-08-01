@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+/**
+ * Class to handle the grid of cells within the game
+ */
 public class Grid {
     private int numberOfMines;
     private int rows;

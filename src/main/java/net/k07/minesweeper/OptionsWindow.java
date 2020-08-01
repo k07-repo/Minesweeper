@@ -2,10 +2,11 @@ package net.k07.minesweeper;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 
+/**
+ * Handles options window and validation of input
+ */
 public class OptionsWindow extends JFrame {
 
     public static JTextField rowField = new JTextField();
