@@ -1,6 +1,5 @@
-package net.k07.minesweeper;
+package k07.minesweeper;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 

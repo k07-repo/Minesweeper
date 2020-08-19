@@ -32,7 +32,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        net.k07.minesweeper.Main
+                                        k07.minesweeper.Main
                                     </mainClass>
                                 </manifest>
                             </archive>

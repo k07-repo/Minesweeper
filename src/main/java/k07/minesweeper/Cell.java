@@ -1,4 +1,4 @@
-package net.k07.minesweeper;
+package k07.minesweeper;
 
 /**
  * Abstraction of the cell class. Handles the state of each cell.

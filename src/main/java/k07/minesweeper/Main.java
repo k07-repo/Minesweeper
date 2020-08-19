@@ -1,4 +1,4 @@
-package net.k07.minesweeper;
+package k07.minesweeper;
 
 /**
  * Entry point
